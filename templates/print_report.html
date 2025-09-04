@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Print Report - {{ analysis.report_id }}</title>
+    <style>
+        @media print {
+            .no-print { display: none; }
+            body { font-size: 12pt; }
+        }
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .section { margin-bottom: 25px; page-break-inside: avoid; }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" class="btn btn-primary">Print</button>
+        <button onclick="window.close()" class="btn btn-secondary">Close</button>
+    </div>
+
+    <!-- Same content as pdf_report.html -->
+    <div class="header">
+        <h1>Digital Forensics Report</h1>
+        <p><strong>Report ID:</strong> {{ analysis.report_id }}</p>
+        <p><strong>Date:</strong> {{ analysis.analysis_date|date:"Y-m-d H:i:s" }}</p>
+        <p><strong>Status:</strong> 
+            <span class="badge 
+                {% if analysis.classification == 'likely_genuine' %}badge-success
+                {% elif analysis.classification == 'suspected_fake' %}badge-warning
+                {% else %}badge-danger{% endif %}">
+                {{ analysis.get_classification_display }}
+            </span>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Detection Results</h2>
+        <div class="text-center">
+            <h3>Authenticity Score: {{ analysis.authenticity_score }}%</h3>
+            <p>Confidence: {{ analysis.get_confidence_level_display }}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Technical Analysis</h2>
+        {% if analysis.detected_artifacts %}
+            {% for artifact in analysis.detected_artifacts %}
+            <div class="artifact-card">
+                <strong>{{ artifact.type|title }}</strong> ({{ artifact.confidence }}% confidence)<br>
+                Location: {{ artifact.location }}<br>
+                Description: {{ artifact.description }}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No significant artifacts detected</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <h2>Summary</h2>
+        <div class="alert 
+            {% if analysis.classification == 'likely_genuine' %}alert-success
+            {% elif analysis.classification == 'suspected_fake' %}alert-warning
+            {% else %}alert-danger{% endif %}">
+            {{ analysis.summary }}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Recommended Action</h2>
+        <p><strong>{{ analysis.get_recommended_action_display }}</strong></p>
+    </div>
+
+    <div class="footer mt-3">
+        <p>Generated on: {% now "Y-m-d H:i:s" %}</p>
+        <p>This is an automated forensic analysis report.</p>
+    </div>
+    </div>
+</body>
+</html>

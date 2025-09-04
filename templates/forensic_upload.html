@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-md-8">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="bi bi-cloud-upload"></i> Forensic Media Analysis Upload</h4>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Media Source</label>
+                            {{ form.media_source }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Analyst ID</label>
+                            {{ form.analyst_id }}
+                            <div class="form-text">Leave blank for system auto-detection</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Media Type</label>
+                        {{ form.media_type }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Select Media File</label>
+                        {{ form.original_file }}
+                        <div class="form-text">Max 10MB. Supported formats: JPG, PNG, WebP, BMP</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-search"></i> Analyze Media
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

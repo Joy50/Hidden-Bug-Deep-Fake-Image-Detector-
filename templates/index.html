@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Main Content -->
+    <div class="container mb-5">
+        <!-- Hero Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="hero-section text-center">
+                    <h1 class="display-4 mb-3 fw-bold">Hidden Bug Deepfake Detection System</h1>
+                    <p class="lead mb-4">Advanced AI-powered detection of manipulated images and face swaps</p>
+                    <div class="mt-4">
+                        <a href="{% url 'upload_image' %}" class="btn btn-light btn-lg me-3">
+                            <i class="bi bi-cloud-upload"></i> Analyze Image
+                        </a>
+                        <a href="#how-it-works" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-info-circle"></i> Learn More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3>AI-Powered Detection</h3>
+                        <p>Utilizes advanced ResNet-50 deep learning model trained on thousands of real and fake images</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h3>Fast Analysis</h3>
+                        <p>Get instant results with our optimized detection pipeline running on GPU acceleration</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="feature-icon mb-3">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>High Accuracy</h3>
+                        <p>State-of-the-art detection algorithms with confidence scoring for reliable results</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works Section -->
+        <div class="row mt-5" id="how-it-works">
+            <div class="col-12">
+                <h2 class="text-center mb-4">How It Works</h2>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <div class="step-number">1</div>
+                            <h4>Upload Image</h4>
+                            <p>Select an image file from your device</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <div class="step-number">2</div>
+                            <h4>AI Analysis</h4>
+                            <p>Our model processes the image using deep learning</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <div class="step-number">3</div>
+                            <h4>Detection</h4>
+                            <p>Algorithm identifies manipulation patterns</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <div class="step-number">4</div>
+                            <h4>Get Results</h4>
+                            <p>Receive detailed analysis with confidence scores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <h3>Ready to Analyze an Image?</h3>
+                        <p class="mb-4">Upload any image to check if it's authentic or AI-generated</p>
+                        <a href="{% url 'upload_image' %}" class="btn btn-success btn-lg">
+                            <i class="bi bi-play-circle"></i> Start Detection Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Supported Image Formats</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="bi bi-file-image"></i> JPEG/JPG</li>
+                            <li class="list-group-item"><i class="bi bi-file-image"></i> PNG</li>
+                            <li class="list-group-item"><i class="bi bi-file-image"></i> WebP</li>
+                            <li class="list-group-item"><i class="bi bi-file-image"></i> BMP</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Technical Specifications</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><i class="bi bi-diagram-3"></i> Model: ResNet-50</li>
+                            <li class="list-group-item"><i class="bi bi-aspect-ratio"></i> Input Size: 224x224 pixels</li>
+                            <li class="list-group-item"><i class="bi bi-gear"></i> Framework: PyTorch</li>
+                            <li class="list-group-item"><i class="bi bi-code-square"></i> Backend: Django</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

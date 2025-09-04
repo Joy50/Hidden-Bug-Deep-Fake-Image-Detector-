@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Forensic Report - {{ analysis.report_id }}</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+            @frame header {
+                -pdf-frame-content: header-content;
+                left: 2cm; width: 16cm; top: 1cm; height: 3cm;
+            }
+            @frame footer {
+                -pdf-frame-content: footer-content;
+                left: 2cm; width: 16cm; bottom: 1cm; height: 2cm;
+            }
+        }
+        
+        body {
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-size: 12pt;
+            line-height: 1.4;
+        }
+        
+        .header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .badge {
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .badge-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+        
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .artifact-card {
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 3px;
+            font-size: 10pt;
+        }
+        
+        .alert {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 3px;
+            font-size: 11pt;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-3 {
+            margin-top: 12px;
+        }
+        
+        .mb-3 {
+            margin-bottom: 12px;
+        }
+        
+        h1 {
+            font-size: 18pt;
+            color: #333;
+        }
+        
+        h2 {
+            font-size: 14pt;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        h3 {
+            font-size: 12pt;
+            color: #666;
+        }
+        
+        .footer {
+            font-size: 9pt;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header for PDF frame -->
+    <div id="header-content">
+        <h1>Digital Forensics Report</h1>
+    </div>
+
+    <div class="header">
+        <p><strong>Report ID:</strong> {{ analysis.report_id }}</p>
+        <p><strong>Date:</strong> {{ analysis.analysis_date|date:"Y-m-d H:i:s" }}</p>
+        <p><strong>Status:</strong> 
+            <span class="badge 
+                {% if analysis.classification == 'likely_genuine' %}badge-success
+                {% elif analysis.classification == 'suspected_fake' %}badge-warning
+                {% else %}badge-danger{% endif %}">
+                {{ analysis.get_classification_display }}
+            </span>
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Detection Results</h2>
+        <div class="text-center">
+            <h3>Authenticity Score: {{ analysis.authenticity_score }}%</h3>
+            <p>Confidence Level: {{ analysis.get_confidence_level_display }}</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Technical Analysis</h2>
+        {% if analysis.detected_artifacts %}
+            {% for artifact in analysis.detected_artifacts %}
+            <div class="artifact-card">
+                <strong>{{ artifact.type|title }}</strong> ({{ artifact.confidence }}% confidence)<br>
+                <strong>Location:</strong> {{ artifact.location }}<br>
+                <strong>Description:</strong> {{ artifact.description }}
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No significant artifacts detected</p>
+        {% endif %}
+    </div>
+
+    {% if analysis.detected_toolkit %}
+    <div class="section">
+        <h2>Toolkit Detection</h2>
+        <p><strong>Detected Generation Toolkit:</strong> {{ analysis.detected_toolkit }}</p>
+    </div>
+    {% endif %}
+
+    <div class="section">
+        <h2>Executive Summary</h2>
+        <div class="alert 
+            {% if analysis.classification == 'likely_genuine' %}alert-success
+            {% elif analysis.classification == 'suspected_fake' %}alert-warning
+            {% else %}alert-danger{% endif %}">
+            {{ analysis.summary }}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Recommended Action</h2>
+        <p><strong>{{ analysis.get_recommended_action_display }}</strong></p>
+    </div>
+
+    <!-- Footer for PDF frame -->
+    <div id="footer-content" class="footer">
+        <p>Generated on: {% now "Y-m-d H:i:s" %} | Page <pdf:pagenumber> of <pdf:pagecount></p>
+        <p>This is an automated forensic analysis report. For expert consultation, contact your digital forensics team.</p>
+    </div>
+</body>
+</html>

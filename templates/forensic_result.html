@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div class="forensic-report container my-5">
+        <!-- Header Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h4><i class="bi bi-file-earmark-text"></i> Digital Forensics Report</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Report ID:</strong> {{ analysis.report_id }}<br>
+                        <strong>Analysis Date:</strong> {{ analysis.analysis_date|date:"Y-m-d H:i:s" }}<br>
+                        <strong>Analyst:</strong> {{ analysis.analyst_id }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Media Source:</strong> {{ analysis.media_source }}<br>
+                        <strong>Media Type:</strong> {{ analysis.media_type|title }}<br>
+                        <strong>Status:</strong>
+                        <span
+                            class="badge {% if analysis.classification == 'likely_genuine' %}bg-success{% elif analysis.classification == 'suspected_fake' %}bg-warning{% else %}bg-danger{% endif %}">
+                            {{ analysis.get_classification_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-4">
+                <!-- Media Preview -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Media Preview</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <img src="{{ analysis.original_file.url }}" class="img-fluid rounded"
+                            style="max-height: 300px;">
+                        <div class="mt-2">
+                            <small class="text-muted">{{ analysis.file_name }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Details -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Media Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>File Name:</strong> {{ analysis.file_name }}</p>
+                        <p><strong>Size:</strong> {{ analysis.file_size|filesizeformat }}</p>
+                        <p><strong>Resolution:</strong> {{ analysis.resolution }}</p>
+                        <p><strong>Format:</strong> {{ analysis.file_format|upper }}</p>
+                        <p><strong>SHA-256:</strong> <code
+                                class="small">{{ analysis.file_hash_sha256|slice:":16" }}...</code></p>
+                        <p><strong>MD5:</strong> <code class="small">{{ analysis.file_hash_md5 }}</code></p>
+                    </div>
+                </div>
+
+                <!-- EXIF Metadata -->
+                {% if analysis.exif_data %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>EXIF Metadata</h6>
+                    </div>
+                    <div class="card-body">
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            {% for key, value in analysis.exif_data.items %}
+                            <div class="small">
+                                <strong>{{ key }}:</strong> {{ value|truncatechars:50 }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-8">
+                <!-- Detection Results -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Detection Results</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div
+                                    class="display-4 {% if analysis.authenticity_score >= 80 %}text-success{% elif analysis.authenticity_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ analysis.authenticity_score }}%
+                                </div>
+                                <small>Authenticity Score</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="display-4">
+                                    {% if analysis.confidence_level == 'high' %}
+                                    <i class="bi bi-shield-check text-success"></i>
+                                    {% elif analysis.confidence_level == 'medium' %}
+                                    <i class="bi bi-shield-exclamation text-warning"></i>
+                                    {% else %}
+                                    <i class="bi bi-shield-x text-danger"></i>
+                                    {% endif %}
+                                </div>
+                                <small>Confidence: {{ analysis.get_confidence_level_display }}</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="display-4">
+                                    {% if result.is_deepfake %}
+                                    <i class="bi bi-robot text-danger"></i>
+                                    {% else %}
+                                    <i class="bi bi-person-check text-success"></i>
+                                    {% endif %}
+                                </div>
+                                <small>Verdict: {{ result.label|title }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Indicators -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Technical Indicators</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.detected_artifacts %}
+                        <div class="row">
+                            {% for artifact in analysis.detected_artifacts %}
+                            <div class="col-md-6 mb-2">
+                                <div
+                                    class="card {% if artifact.confidence > 70 %}border-danger{% elif artifact.confidence > 50 %}border-warning{% else %}border-info{% endif %}">
+                                    <div class="card-body py-2">
+                                        <h6 class="card-title mb-1">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            {{ artifact.type|title }}
+                                        </h6>
+                                        <div class="d-flex justify-content-between">
+                                            <small class="text-muted">{{ artifact.location }}</small>
+                                            <span class="badge bg-secondary">{{ artifact.confidence }}%</span>
+                                        </div>
+                                        <p class="card-text small mb-0">{{ artifact.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No significant artifacts detected</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Adversarial Analysis -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Adversarial Analysis</h6>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.detected_toolkit %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-tools"></i>
+                            <strong>Detected Toolkit Signature:</strong> {{ analysis.detected_toolkit }}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No known adversarial toolkit signatures detected</p>
+                        {% endif %}
+
+                        {% if analysis.metadata_inconsistencies %}
+                        <div class="mt-3">
+                            <h6>Metadata Inconsistencies:</h6>
+                            <div class="alert alert-info small">
+                                {{ analysis.metadata_inconsistencies|linebreaks }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Summary & Recommendations -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6>Summary & Recommendations</h6>
+                    </div>
+                    <div class="card-body">
+                        <div
+                            class="alert {% if analysis.classification == 'likely_genuine' %}alert-success{% elif analysis.classification == 'suspected_fake' %}alert-warning{% else %}alert-danger{% endif %}">
+                            <h5>Executive Summary</h5>
+                            <p class="mb-0">{{ analysis.summary }}</p>
+                        </div>
+
+                        <div class="mt-3">
+                            <h6>Recommended Action:</h6>
+                            <div class="alert 
+                                {% if analysis.recommended_action == 'flag_review' %}alert-info
+                                {% elif analysis.recommended_action == 'archive' %}alert-warning
+                                {% elif analysis.recommended_action == 'alert_units' %}alert-danger
+                                {% else %}alert-secondary{% endif %}">
+                                <i class="bi bi-{% if analysis.recommended_action == 'flag_review' %}flag
+                                {% elif analysis.recommended_action == 'archive' %}archive
+                                {% elif analysis.recommended_action == 'alert_units' %}bell
+                                {% else %}link-45deg{% endif %}"></i>
+                                <strong>{{ analysis.get_recommended_action_display }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <h6>Next Steps:</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item">Verify results with secondary detection methods</li>
+                                <li class="list-group-item">Cross-reference with known deepfake databases</li>
+                                <li class="list-group-item">Document findings in case management system</li>
+                                <li class="list-group-item">Schedule human expert review if confidence is low</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="btn-group" role="group">
+                            <a href="{% url 'export_pdf' analysis.id %}" class="btn btn-outline-primary">
+                                <i class="bi bi-download"></i> Export PDF
+                            </a>
+                            <a href="{% url 'print_report' analysis.id %}" target="_blank"
+                                class="btn btn-outline-secondary">
+                                <i class="bi bi-printer"></i> Print
+                            </a>
+                            <a href="{% url 'forensic_analysis' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> New Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .forensic-report {
+        font-family: 'Courier New', monospace;
+        max-width: 1200px;
+    }
+
+    .card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        font-weight: 600;
+    }
+
+    .display-4 {
+        font-size: 2.5rem;
+        font-weight: 300;
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    .list-group-item {
+        border: 1px solid rgba(0, 0, 0, .125);
+        padding: 0.75rem 1.25rem;
+    }
+
+    .small {
+        font-size: 0.875em;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Expand EXIF data on click
+        const exifSection = document.querySelector('.card-body div[style*="max-height: 200px"]');
+        if (exifSection) {
+            exifSection.addEventListener('click', function () {
+                this.style.maxHeight = 'none';
+                this.style.overflowY = 'visible';
+            });
+        }
+
+        // Print functionality
+        const printBtn = document.getElementById('print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', function () {
+                window.print();
+            });
+        }
+    });
+</script>
+{% endblock %}
